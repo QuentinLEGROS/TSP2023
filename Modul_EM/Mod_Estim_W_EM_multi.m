@@ -1,4 +1,4 @@
-function [W_out,P,Mu_out,Amp_out]=Mod_Estim_W_EM_multi(Y,Fct,Ns,step_Nx,reg_mu,c,step_r,step_v,ifplot,bolpol,bolamp,G)
+function [W_out,P,Mu_out,Amp_out]=Mod_Estim_W_EM_multi(Y,Fct,Ns,step_Nx,reg_mu,c,step_r,step_v,ifplot,bolpol,bolamp,G,N_samp)
     
 
 % Main algorithm: estimate the mixture weights
@@ -72,7 +72,8 @@ while ((m_compt<=20 && derr>1e-3 && err0>1e-10) || m_compt<=20)
            muc = compute_itSMAP(P,Ns,step_r,step_v);
         else % Apply Lap prior
            C=Mod_comp_plik_multi(Y,Fct,wc,Ns);  % using SEM
-           [P,muc]=compute_P_Reg2_2n(C,muc,c,reg_mu,30,Ns,step_r,step_v);
+%            [P,muc]=compute_P_Reg2_2n(C,muc,c,reg_mu,30,Ns,step_r,step_v);
+           [P,muc]=compute_P_Reg0_2n(C,muc,c,reg_mu,N_samp,Ns,step_r,step_v);
         end
     else % Uniform prior
        C=Mod_comp_plik_multi(Y,Fct,wc,Ns); 
@@ -139,7 +140,7 @@ if bolpol
     Mu_out = poly_int(muc,step_r);
 %     Mu_out = poly_in(muc);
 end
-
+Mu_out = min(max(Mu_out,1),Nx);
 
 if ifplot
     %close all
