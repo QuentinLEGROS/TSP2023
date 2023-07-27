@@ -143,8 +143,8 @@ end
 W_out = W_out ./ iteEM; % mean of the (N_iter-N_bi) iterations
 
 if bolpol
-%     Mu_out = poly_int(muc,step_r);
-    Mu_out = poly_in(muc);
+    Mu_out = poly_int(muc,step_r);
+%     Mu_out = poly_in(muc);
 end
 Mu_out = min(max(Mu_out,1),Nx);
 
