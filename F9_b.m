@@ -24,7 +24,7 @@ addpath(strcat([folder 'Modul_EM']));
 addpath(strcat([folder 'Compute_Amplitude_DF']));
 
 snr_range = [-20 20]; % SNR range to compute
-MCrep = 50;          % number of MC realization (20-30 are sufficient to reproduce the figure behaviour)
+MCrep = 5;          % number of MC realization (20-30 are sufficient to reproduce the figure behaviour)
 
 %% Time-frequency representation parameters
 M       = 500;       %% Number of frequential bin
@@ -33,11 +33,13 @@ L       = 20;        %% analysis window size (in bin)
 N     = 500;                        %% signal length
 
 % Amplitude modulated
-amp0(:,1)=(1:-0.5/(N-1):0.5)+1;
-amp0(:,2)=(0.5:0.5/(N-1):1)+1;
+amp0(:,1)=(1:-0.5/(N-1):0.5);
+amp0(:,2)=(0.5:0.5/(N-1):1);
+% amp0(:,2)=((0.5.*cos(2*pi*(0:N-1)/(2*N/3)))+1)'
 
 X(:,1) = amp0(:,1).*real(fmlin(N,0.1,0.4));
 X(:,2) = amp0(:,2).*real(fmlin(N,0.3,0.15));
+
 
 Ncomp = size(X,2);
 x0 = sum(X,2);
@@ -90,10 +92,10 @@ methods_name = {'EM',...
                 };
             
             
-methods_to_use = [1 2 3 4 5 6];   % insert here the indices of the methods to compare (names above)
+methods_to_use = 2%[1 2 3 4 5 6];   % insert here the indices of the methods to compare (names above)
 
 nb_methods = length(methods_to_use);
-SNRt = snr_range(1):2:snr_range(2);
+SNRt = snr_range(1):4:snr_range(2);
 
 MAE_out = zeros(length(SNRt), nb_methods);
 
@@ -121,14 +123,14 @@ for indsnr = 1:length(SNRt)
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
                         ifplot = 0;
-                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-4,step_r,step_v,ifplot,1,1,G);
+                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e0,step_r,step_v,ifplot,1,1,G,1,L);
                         tf = min(max(tf,1),M/2);
                         tf1(:,:,it) = tf;
                 case 2  %% Oracle EM
                         [tfr]  = tfrgab2(x, M, L);
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0);
+                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0,M,L);
                         tf = tf0;
                 case 3  %% Beta divergence
                         alpha  = 0.4;
@@ -171,7 +173,12 @@ end %% snrs
 
 % Normalization
 MAE_out = MAE_out ./(N*Ncomp);
-
+% 
+figure
+subplot(2,1,1)
+plot(amp0)
+subplot(2,1,2)
+plot(Amp)
 
 
 %% Plot

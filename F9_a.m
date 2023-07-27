@@ -1,6 +1,6 @@
 clear all
 close all
-clc
+% clc
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Generate Figure 9a of the pper "Instantaneous Frequency and Amplitude
@@ -33,11 +33,14 @@ L       = 20;        %% analysis window size (in bin)
 N     = 500;                        %% signal length
 
 % Amplitude modulated
-amp0(:,1)=(1:-0.5/(N-1):0.5)+1;
-amp0(:,2)=(0.5:0.5/(N-1):1)+1;
+amp0(:,1)=(1:-0.5/(N-1):0.5);
+amp0(:,2)=(0.5:0.5/(N-1):1);
 
 X(:,1) = amp0(:,1).*real(fmlin(N,0.15,0.3));
 X(:,2) = amp0(:,2).*real(fmsin(N,0.3,0.45,700,1,0.3,+1));
+
+% amp0(:,1) = (1:-0.5/(N-1):0.5)+1;
+% X(:,1) = amp0(:,1).*real(fmconst(N,0.25));
 
 Ncomp = size(X,2);
 x0 = sum(X,2);
@@ -121,7 +124,7 @@ for indsnr = 1:length(SNRt)
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
                         ifplot = 0;
-                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-4,step_r,step_v,ifplot,1,1,G);
+                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,0,1,G,1,L);
                         tf = min(max(tf,1),M/2);
                         tf1(:,:,it) = tf;
                         % ajouter calcul amp
@@ -129,7 +132,7 @@ for indsnr = 1:length(SNRt)
                         [tfr]  = tfrgab2(x, M, L);
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0);
+                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0,M,L);
                         tf = tf0;
                         % ajouter calcul amp + Oracle tf
                 case 3  %% Beta divergence
@@ -174,7 +177,13 @@ end %% snrs
 % Normalization
 MAE_out = MAE_out ./(N*Ncomp);
 
+% figure
+% hold on;
+% plot(amp0)
+% plot(Amp)
 
+% filename = "F9a_R1.mat";
+% save(filename,"methods_name","amp0","MAE_out")
 
 %% Plot
 cols         = {'k-x' 'b-x' 'g-x' 'r-x' 'k-o' 'b-s' 'g-.' 'r-.' 'b-v'  'b--' 'b*'};

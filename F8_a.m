@@ -92,7 +92,7 @@ SNRt = snr_range(1):2:snr_range(2);
 MAE_out = zeros(length(SNRt), nb_methods);
 
 %% Compute RQF
-for indsnr = 1:length(SNRt)
+for indsnr = 1%:length(SNRt)
   fprintf(1, "+ SNR=%d dB \n", SNRt(indsnr));
   SNRi = SNRt(indsnr);
 
@@ -117,7 +117,7 @@ for indsnr = 1:length(SNRt)
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
                         ifplot = 0;
-                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-1,step_r,step_v,ifplot,0,1,G);
+                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-1,step_r,step_v,ifplot,0,1,G,1,L);
                         tf1(:,:,it) = tf;
                 case 2  %% Oracle EM
                         step_r = 10;
@@ -125,7 +125,7 @@ for indsnr = 1:length(SNRt)
                         [tfr]  = tfrgab2(x, M, L);
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0);
+                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0,M,L);
                         tf = tf0;
                 case 3  %% Beta divergence
                         alpha  = 0.4;
@@ -169,7 +169,12 @@ end %% snrs
 % Normalization
 MAE_out = MAE_out ./(N*Ncomp);
 
-
+% figure
+% % subplot(2,1,1)
+% hold on;
+% plot(amp0)
+% % subplot(2,1,2)
+% plot(Amp)
 
 %% Plot
 cols         = {'k-x' 'b-x' 'g-x' 'r-x' 'k-o' 'b-s' 'g-.' 'r-.' 'b-v'  'b--' 'b*'};

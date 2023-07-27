@@ -116,7 +116,7 @@ for indsnr = 1:length(SNRt)
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
                         ifplot = 0;
-                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-1,step_r,step_v,ifplot,0,1,G);
+                        [~,~,tf,Amp]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-1,step_r,step_v,ifplot,0,1,G,1,L);
                         tf1(:,:,it) = tf;
                 case 2  %% Oracle EM
                         step_r = 10;
@@ -124,7 +124,7 @@ for indsnr = 1:length(SNRt)
                         [tfr]  = tfrgab2(x, M, L);
                         Spect = abs(tfr(1:M/2,:)).^2;
                         [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0);
+                        [Amp]=Oracle_EM(Spect',Fc,Ncomp,G,tf0,M,L);
                         tf = tf0;
                 case 3  %% Beta divergence
                         alpha  = 0.4;

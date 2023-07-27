@@ -26,7 +26,7 @@ addpath(strcat([folder 'Modul_EM']));
 
 
 snr_range = [-20 20]; % SNR range to compute
-MCrep = 50;          % number of MC realization (20-30 are sufficient to reproduce the figure behaviour)
+MCrep = 100;          % number of MC realization (20-30 are sufficient to reproduce the figure behaviour)
 
 %% Time-frequency representation parameters
 M       = 500;       %% Number of frequential bin
@@ -39,26 +39,26 @@ N     = 500;                        %% signal length
 amp0(:,1)=(1:-0.5/(N-1):0.5)+1;
 amp0(:,2)=(0.5:0.5/(N-1):1)+1;
 
-figure
-colormap(flipud(gray))
-subplot(2,1,1)
-plot(amp0(:,1))
-axis square
-xlim([0,N])
-ax = gca;
-ax.YDir = 'normal'
-ylabel('Component amplitude','FontSize', 11, 'FontWeight', 'bold')
-subplot(2,1,2)
-plot(amp0(:,2))
-xlim([0,N])
-axis square
-ax = gca;
-ax.YDir = 'normal'
-xlabel('Time index','FontSize', 15, 'FontWeight', 'bold')
-ylabel('Component amplitude','FontSize', 11, 'FontWeight', 'bold')
+% figure
+% colormap(flipud(gray))
+% subplot(2,1,1)
+% plot(amp0(:,1))
+% axis square
+% xlim([0,N])
+% ax = gca;
+% ax.YDir = 'normal'
+% ylabel('Component amplitude','FontSize', 11, 'FontWeight', 'bold')
+% subplot(2,1,2)
+% plot(amp0(:,2))
+% xlim([0,N])
+% axis square
+% ax = gca;
+% ax.YDir = 'normal'
+% xlabel('Time index','FontSize', 15, 'FontWeight', 'bold')
+% ylabel('Component amplitude','FontSize', 11, 'FontWeight', 'bold')
 
-X(:,1) = amp0(:,1).*(fmlin(N,0.1,0.4));
-X(:,2) = amp0(:,2).*(fmlin(N,0.3,0.15));
+X(:,1) = amp0(:,1).*real(fmlin(N,0.1,0.4));
+X(:,2) = amp0(:,2).*real(fmlin(N,0.3,0.15));
 
 
 x0 = sum(X,2);
@@ -101,14 +101,15 @@ step_v = 3*step_r;
 
 
 %% Initialization
-methods_name = {'Carmona [20]',...
-                'Carmona + pp [20]',...
-                'PB-\alpha=0.5 [8]',...
+methods_name = {'Carmona [17]',...
+                'Carmona + pp [17]',...
+                'PB-\alpha=0.5 [10]',...
                 'EM-Lap + pp',...
+                'EM-TV + pp',...
                 };
 
 %% Insert here the indices of the methods to compare (names above)
-methods_to_use = [1 2 3 4]; 
+methods_to_use = [1 2 3 4 5]; 
 
 nb_methods = length(methods_to_use);
 SNRt = snr_range(1):4:snr_range(2);
@@ -150,7 +151,11 @@ for indsnr = 1:length(SNRt)
                    
                 case 4 %% EM LAP + pp
                     [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-                    [~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-4,step_r,step_v,ifplot,1,0,G);
+                    [~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,1,0,G,1,L);
+
+                case 5 %% EM LAP + pp
+                    [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
+                    [~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'TV',1e-2,step_r,step_v,ifplot,1,0,G,1,L);
 
             end  %% switch
 

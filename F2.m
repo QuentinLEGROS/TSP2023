@@ -70,7 +70,7 @@ Spect = abs(tfr(1:M/2,:)).^2;
             
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,0,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,0,0,0,0);
 tf = min(max(1,tf-1),N/2);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);
@@ -99,7 +99,7 @@ axis square
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,1,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,1,0,0,0);
 tf = min(max(1,tf-1),N/2);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);
@@ -158,7 +158,7 @@ Spect = abs(tfr(1:M/2,:)).^2;
             
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-4,step_r,step_v,ifplot,0,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,0,0,0,0);
 tf = min(max(1,tf-1),N/2);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);
@@ -187,7 +187,7 @@ axis square
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-4,step_r,step_v,ifplot,1,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'Lap',1e-2,step_r,step_v,ifplot,1,0,0,0);
 tf = min(max(1,tf-1),N/2);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);

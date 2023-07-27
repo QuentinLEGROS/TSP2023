@@ -66,7 +66,7 @@ Spect = abs(tfr(1:M/2,:)).^2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'TV',1e1,step_r,step_v,ifplot,0,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'TV',1e1,step_r,step_v,ifplot,0,0,0,0);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);
 for c = 1:Ncomp
@@ -104,7 +104,7 @@ x = sigmerge(x0, randn(size(x0)),SNR);
 Spect = abs(tfr(1:M/2,:)).^2;
 
 [Fc]=comp_Fc(M,L);Fc = Fc + eps;     %% Data distribution
-[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'TV',1e1,step_r,step_v,ifplot,0,0);
+[~,~,tf]=Mod_Estim_W_EM_multi(Spect',Fc,Ncomp,1,'TV',1e1,step_r,step_v,ifplot,0,0,0,0);
 [mask] = compMask(round(tf),Pnei,N,0);
 x_hat = zeros(Ncomp,N);
 for c = 1:Ncomp
