@@ -1,4 +1,4 @@
-function [Amp_out]=Oracle_EM(Y,Fct,Ns,G,tf0)
+function [Amp_out]=Oracle_EM(Y,Fct,Ns,G,tf0,M,L)
     
 
 % Main algorithm: estimate the mixture weights
@@ -32,27 +32,33 @@ m_compt=1; % Initialization of EM iteration Count
 Stopping_EM = 0; % EM stopping criterion
 
 
-while (m_compt<=20)
+% while (m_compt<=20)
 
 
     %% Maximization step
-        wc=Mod_Mstep_multi(Y,Fct,wc,alpha,Ns,tf0);
+        W_out=Mod_Mstep_multi(Y,Fct,wc,alpha,Ns,tf0);
+% 
+%     
+% 
+%     m_compt = m_compt+1;
+% 
+%     if (m_compt==15)  % Begin the last 5 iterations
+%         Stopping_EM = 1;
+%     end
+%     if Stopping_EM == 1
+%         W_out=W_out+wc;
+%         iteEM = iteEM + 1;
+%     end
+%     
+%     figure(1)
+%     plot(wc)
+%     pause(0.5)
+%     
+%     
+% end
+% W_out = W_out ./ iteEM; 
 
-    
-
-    m_compt = m_compt+1;
-
-    if (m_compt==15)  % Begin the last 5 iterations
-        Stopping_EM = 1;
-    end
-    if Stopping_EM == 1
-        W_out=W_out+wc;
-        iteEM = iteEM + 1;
-    end
-end
-W_out = W_out ./ iteEM; 
-
-Amp_out = Estim_Amp(tf0,Y,W_out,G);
+Amp_out = Estim_Amp(tf0,Y,W_out,G,M,L);
 Amp_out = sqrt(Amp_out);
 
 

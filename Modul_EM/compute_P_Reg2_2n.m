@@ -45,10 +45,21 @@ for ns = 1:Ns
 %             post=exp(ppost);
 %             ppost=post./(sum(post,2)*ones(1,Nx));
 %             Mu2(ind0{r},ns)=denSampling(1:Nx,ppost);
+%             
+%         C((ind0{r}),:)=plik+pprior;
+%         cprior((ind0{r}),:) = pprior;
+%         cplik((ind0{r}),:) = plik;
+%             
 %         end
 %     end
-    
-    
+%     
+% %     C = ppost;
+%     C=C(3:end-2,:);
+%     C=reshape(C,N,Nx);
+%     C=C-max(C,[],2)*ones(1,Nx);
+%     P=exp(C);
+%     P=P./(sum(P,2)*ones(1,Nx));
+%     P_out = P_out+P;
 
     C=zeros(N+4,Nx);
     %% Compute posterior from samples after convergence of the priors

@@ -1,4 +1,4 @@
-function [W_out,P,Mu_out,Amp_out]=Mod_Estim_W_EM_multi(Y,Fct,Ns,step_Nx,reg_mu,c,step_r,step_v,ifplot,bolpol,bolamp,G,N_samp,L)
+function [W_out,P,Mu_out,Amp_out]=Mod_Estim_W_SEM(Y,Fct,Ns,step_Nx,c,step_r,step_v,ifplot,bolpol,bolamp,G,N_samp,L)
     
 
 % Main algorithm: estimate the mixture weights
@@ -33,7 +33,6 @@ end
 
 wc=0.01*ones(N,Ns); % Initialization current W
 muc=(floor(M/(Ns+1)):floor(M/(Ns+1)):M-floor(M/(Ns+1))).*ones(N,Ns); % Initialization current mu
-muold = muc; % Store previous iteration of mu
     
 iteEM = 0; % Number of EM iteration used to average W
 pT=ones(1,Nz)./Nx; % Initialization uniform prior for mu (first EM iterations)
@@ -42,14 +41,12 @@ alpha=1.01*ones(1,Ns+1); % Initialization W priors fixed : alpha,beta (first EM 
 
 
 % Initialization without priors
-if (strcmp(reg_mu,'TV') ||(strcmp(reg_mu,'Lap')))
-    C=Mod_comp_plik_multi(Y,Fct,wc,Ns); 
-    C=C-max(C,[],2)*ones(1,Nz);
-    P=exp(C);
-    P=P./(sum(P,2)*ones(1,Nz)); % Normalization
-    muc=denSampling(1:Nz,P); % Gibbs sampling
-    muc = muc.*step_Nx;
-end
+C=Mod_comp_plik_multi(Y,Fct,wc,Ns); 
+C=C-max(C,[],2)*ones(1,Nz);
+P=exp(C);
+P=P./(sum(P,2)*ones(1,Nz)); % Normalization
+muc=denSampling(1:Nz,P); % Gibbs sampling
+muc = muc.*step_Nx;
    
 W_out=zeros(N,Ns); % Initialization output 
 Mu_out=zeros(N,Ns); % Initialization output 
@@ -59,45 +56,24 @@ err0 = 10e9;
 derr = 10e9;
 errold = 10e9;
 
-
 while ((m_compt<=20 && derr>1e-3 && err0>1e-10) || m_compt<=20)
     %% E-step
 %     disp(['EM iteration : ',num2str(m_compt)])
-    if (strcmp(reg_mu,'TV') ||(strcmp(reg_mu,'Lap'))) % TV or Lap regularization on mu
-        if m_compt<5 % first iterations without regularization
-           C=Mod_comp_plik_multi(Y,Fct,wc,Ns); 
-           C=C+ones(N,1)*log(pT);
-           C=C-max(C,[],2)*ones(1,Nz);
-           P=exp(C);
-           P=P./(sum(P,2)*ones(1,Nz));
-           muc = compute_itSMAP(P,Ns,step_r,step_v);
-        else % Apply Lap prior
-           C=Mod_comp_plik_multi(Y,Fct,wc,Ns);  % using SEM
-           if (strcmp(reg_mu,'TV'))
-                [P,muc]=compute_P_Reg_2n_TV(C,muc,c,Ns,step_r,step_v);
-%                 [P,muc]=compute_P_Reg0_2n_TV(C,muc,c,N_samp,Ns,step_r,step_v);
-           else
-               [P,muc]=compute_P_Reg_2n_Lap(C,muc,c,Ns,step_r,step_v);
-%                [P,muc]=compute_P_Reg0_2n_Lap(C,muc,c,N_samp,Ns,step_r,step_v);
-           end
-        end
-    else % Uniform prior
+    if m_compt<2 % first iterations without regularization
        C=Mod_comp_plik_multi(Y,Fct,wc,Ns); 
        C=C+ones(N,1)*log(pT);
        C=C-max(C,[],2)*ones(1,Nz);
        P=exp(C);
        P=P./(sum(P,2)*ones(1,Nz));
        muc = compute_itSMAP(P,Ns,step_r,step_v);
-       [~,nn]=sort(mean(muc,1));
-       muc = muc(:,flip(nn));
+    else % Apply Lap prior
+       C=Mod_comp_plik_multi(Y,Fct,wc,Ns);  % using SEM
+       [P,muc]=compute_Sstep_TV(C,muc,c,N_samp,Ns,step_r,step_v);
     end
+
     
     %% Maximization step
-    if m_compt<3 % first iterations without priors
-        wc=Mod_Mstep_multi(Y,Fct,wc,alpha,Ns,muc);
-    else 
-        wc=Mod_Mstep_multi(Y,Fct,wc,alpha,Ns,muc); % to update using Dirichlet prior for instance
-    end
+    wc=Mod_Mstep_multi(Y,Fct,wc,alpha,Ns,muc);
     derr = norm(err0-errold);
     errold = err0;
     
@@ -140,11 +116,19 @@ while ((m_compt<=20 && derr>1e-3 && err0>1e-10) || m_compt<=20)
         iteEM = iteEM + 1;
     end
 end
+
+%% Compute M
+Mu_out = compute_itSMAP(P,Ns,step_r,step_v);
+
+[~,nn]=sort(mean(Mu_out,1));
+Mu_out = Mu_out(:,flip(nn));
+
+
 W_out = W_out ./ iteEM; % mean of the (N_iter-N_bi) iterations
 
 if bolpol
-%     Mu_out = poly_int(muc,step_r);
-    Mu_out = poly_in(muc);
+    Mu_out = poly_int(muc,step_r);
+%     Mu_out = poly_in(muc);
 end
 Mu_out = min(max(Mu_out,1),Nx);
 

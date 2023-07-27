@@ -1,4 +1,4 @@
-function wc = Mod_NR_multi(y,wc,Ft,alpha,Ns,muc)
+function wc = Mod_NR_multi(y,wc,Ft,alpha,Ns,muc,p)
 
 
 
